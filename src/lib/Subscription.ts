@@ -127,8 +127,13 @@ export default class Subscription {
 		if (settings.floatplane.videosToSearch === 0) return;
 		let videosSearched = 0;
 		console.log(chalk`Searching for new videos in {yellow ${this.plan}}`);
-		for await (const blogPost of fApi.creator.blogPostsIterable(this.creatorId)) {
-			for await (const video of this.matchChannel(blogPost)) {
+   			// The creator list endpoint no longer includes videoAttachments/attachmentOrder,
+   			// so fetch the full post when they are missing instead of silently skipping it.
+   			const videos =
+   				blogPost.videoAttachments === undefined && blogPost.metadata?.hasVideo
+   					? this.seekAndDestroy(await fApi.content.post(blogPost.id))
+   					: this.matchChannel(blogPost);
+   			for await (const video of videos) {			for await (const video of this.matchChannel(blogPost)) {
 				yield video;
 			}
 
