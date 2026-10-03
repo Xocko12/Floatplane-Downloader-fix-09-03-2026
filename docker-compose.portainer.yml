@@ -1,0 +1,12 @@
+   services:
+     floatplane-downloader:
+       build:
+         context: .
+       image: floatplane-downloader:fix
+       container_name: floatplane-downloader
+       restart: unless-stopped
+       environment:
+         - headless=true
+       volumes:
+         - ${DB_PATH:?Set DB_PATH}:/fp/db
+         - ${VIDEOS_PATH:?Set VIDEOS_PATH}:/fp/videos
